@@ -40,7 +40,7 @@ resource "aws_lambda_function" "notification_forwarder" {
 
   environment {
     variables = {
-      SQS_QUEUE = data.aws_sqs_queue.notification_queue.name
+      SQS_QUEUE = data.aws_sqs_queue.notification_queue.url
     }
   }
 
@@ -81,8 +81,8 @@ resource "aws_lambda_function" "notification_processing" {
     variables = {
       DB_TABLE                  = var.dynamodb_table_name
       SNS_TOPIC                 = var.notifications_sns_topic
-      SQS_QUEUE                 = data.aws_sqs_queue.notification_queue.name
-      DLQ_QUEUE                 = data.aws_sqs_queue.notification_dlq_queue.name
+      SQS_QUEUE                 = data.aws_sqs_queue.notification_queue.url
+      DLQ_QUEUE                 = data.aws_sqs_queue.notification_dlq_queue.url
       NOTIFICATION_SES_TEMPLATE = var.notification_ses_template_name
     }
   }
@@ -92,7 +92,7 @@ resource "aws_lambda_function" "notification_processing" {
 }
 
 resource "aws_iam_policy" "notifications_db_read_policy" {
-  name   = "ecommerce-db-secrets-read-policy"
+  name   = "notifications_db_read_policy"
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -111,7 +111,7 @@ resource "aws_iam_policy" "notifications_db_read_policy" {
 EOF
 }
 resource "aws_iam_policy" "notification_queue_policy" {
-  name   = "ecommerce-order-processing-sqs-read-delete-policy"
+  name   = "notification_queue_policy"
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -133,7 +133,7 @@ EOF
 }
 
 resource "aws_iam_policy" "notification_dlq_policy" {
-  name   = "ecommerce-update-stocks-read-delete-policy"
+  name   = "notification_dlq_policy"
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -154,11 +154,42 @@ resource "aws_iam_policy" "notification_dlq_policy" {
 EOF
 }
 
+resource "aws_iam_policy" "lambda_logs_policy" {
+  name = "lamba-logs-policy"
+
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": "logs:CreateLogGroup",
+            "Resource": "arn:aws:logs:region:accountID:*"
+        },
+
+        {
+            "Effect": "Allow",
+            "Action": [
+                "logs:CreateLogStream",
+                "logs:PutLogEvents"
+            ],
+            "Resource": [
+                "arn:aws:logs:region:accountID:log-group:*"
+            ]
+        }
+    ]
+}
+EOF
+
+}
+
 locals {
   policy_arns = [
     aws_iam_policy.notifications_db_read_policy.arn,
     aws_iam_policy.notification_queue_policy.arn,
-    aws_iam_policy.notification_dlq_policy.arn
+    aws_iam_policy.notification_dlq_policy.arn,
+    aws_iam_policy.lambda_logs_policy.arn,
+
   ]
 }
 
