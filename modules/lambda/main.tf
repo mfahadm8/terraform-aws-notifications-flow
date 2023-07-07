@@ -3,7 +3,7 @@ data "aws_sqs_queue" "notification_queue" {
 }
 
 data "aws_sqs_queue" "notification_dlq_queue" {
-  name = var.notification_dlq_queue_name
+  name = var.notification_dlq_name
 }
 
 data "aws_dynamodb_table" "notification" {
@@ -263,7 +263,7 @@ resource "aws_lambda_event_source_mapping" "dynamodb_stream" {
 resource "aws_lambda_permission" "notification_queue_permission" {
   statement_id  = "AllowLambdaOrderProcessingQueue"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.notification_processing.name
+  function_name = aws_lambda_function.notification_processing.arn
   principal     = "sqs.amazonaws.com"
   source_arn    = data.aws_sqs_queue.notification_queue.arn
 }
@@ -271,7 +271,7 @@ resource "aws_lambda_permission" "notification_queue_permission" {
 resource "aws_lambda_permission" "notification_dlq_permission" {
   statement_id  = "AllowLambdaUpdateStocksQueue"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.notification_failure_update.name
+  function_name = aws_lambda_function.notification_failure_update.arn
   principal     = "sqs.amazonaws.com"
   source_arn    = data.aws_sqs_queue.notification_dlq_queue.arn
 }

@@ -5,7 +5,7 @@ resource "aws_dynamodb_table" "notification" {
   hash_key     = "id"
 
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
   }
 
   stream_enabled   = true
@@ -13,51 +13,6 @@ resource "aws_dynamodb_table" "notification" {
 
   attribute {
     name = "id"
-    type = "N"
-  }
-
-  attribute {
-    name = "notification_type"
-    type = "S"
-  }
-  attribute {
-    name = "notification_scenario"
-    type = "S"
-  }
-  attribute {
-    name = "mobile_no"
-    type = "S"
-  }
-  attribute {
-    name = "sms_message"
-    type = "S"
-  }
-  attribute {
-    name = "to_email_address"
-    type = "S"
-  }
-  attribute {
-    name = "to_name"
-    type = "S"
-  }
-  attribute {
-    name = "profile_id"
-    type = "S"
-  }
-  attribute {
-    name = "job_id"
-    type = "S"
-  }
-  attribute {
-    name = "job_title"
-    type = "S"
-  }
-  attribute {
-    name = "email_template"
-    type = "S"
-  }
-  attribute {
-    name = "read_date_time"
     type = "N"
   }
 }
