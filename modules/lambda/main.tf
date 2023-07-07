@@ -12,8 +12,8 @@ data "aws_dynamodb_table" "notification" {
 
 data "archive_file" "notification_forwarder_zip" {
   type        = "zip"
-  source_dir  = "${path.root}/notification_forwarder"
-  output_path = "${path.root}/notification_forwarder.zip"
+  source_dir  = "${path.root}/src/NotificationsForwarder"
+  output_path = "${path.root}/notification_forwarder_package.zip"
 }
 
 data "archive_file" "notification_failure_update_zip" {
@@ -103,7 +103,7 @@ resource "aws_iam_policy" "notifications_db_read_policy" {
         "dynamodb:*"
       ],
       "Resource": [
-        "arn:aws:dynamodb:${var.region}:${var.account_id}:table/${var.dynamodb_table_name}"
+        "arn:aws:dynamodb:${var.region}:${var.account_id}:table/${var.dynamodb_table_name}*"
       ]
     }
   ]
