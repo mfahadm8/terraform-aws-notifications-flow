@@ -59,7 +59,8 @@ resource "aws_lambda_function" "notification_failure_update" {
 
   environment {
     variables = {
-      DB_TABLE = var.dynamodb_table_name
+      DB_TABLE  = var.dynamodb_table_name
+      DLQ_QUEUE = data.aws_sqs_queue.notification_dlq_queue.url
     }
   }
 

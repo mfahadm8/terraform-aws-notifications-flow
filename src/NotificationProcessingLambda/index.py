@@ -3,10 +3,10 @@ import json
 import os
 
 dynamodb = boto3.client('dynamodb')
-sns = boto3.client('sns')
+
 ses = boto3.client('ses')
 sqs = boto3.client('sqs')
-
+sns = boto3.client('sns')
 SQS_QUEUE=os.environ.get("SQS_QUEUE")
 DLQ_QUEUE=os.environ.get("DLQ_QUEUE")
 SNS_TOPIC_ARN=os.environ.get("SNS_TOPIC_ARN")
@@ -15,31 +15,31 @@ NOTIFICATION_SES_TEMPLATE=os.environ.get("NOTIFICATION_SES_TEMPLATE")
 def handler(event, context):
     print(event)
     for record in event['Records']:
-        message = json.loads(record['body'])
-        notification_id = message['notification_id']
+        message = dict(json.loads(record['body']))
+        notification_id = message['id']
         notification_type = message['notification_type']
-        # Extract other attributes as needed
+        to_name=message["to_name"]
 
         if notification_type == 'SMS':
-            mobile_no = message['mobile_no']
+            mobile_no =  message['mobile_no']
             sms_message = message['sms_message']
             # Send SMS using SNS
             sns.publish(
                 TopicArn=SNS_TOPIC_ARN,
                 PhoneNumber=mobile_no,
-                Message=sms_message
+                Message=f"Hi, {to_name},\n"+sms_message
             )
+            
         elif notification_type == 'EMAIL':
             to_email_address = message['to_email_address']
             template_data = json.dumps({
-                'name': 'Alejandro',
-                'favoriteanimal': 'alligator'
+                'name': to_name,
+                'message': 'alligator'
             })
             # Send email using SES
             ses.send_templated_email(
-                Source='Mary Major <mary.major@example.com>',
-                Template='MyTemplate',
-                ConfigurationSetName='ConfigSet',
+                Source='Muhammad Fahad Mustaf <mfahadm8@gmail.com>',
+                Template=NOTIFICATION_SES_TEMPLATE,
                 Destination={
                     'ToAddresses': [to_email_address]
                 },

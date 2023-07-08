@@ -1,5 +1,6 @@
 import boto3
 import os
+import json
 
 dynamodb = boto3.client('dynamodb')
 sqs = boto3.client("sqs")
@@ -11,7 +12,7 @@ def handler(event, context):
     print(event)
 
     for record in event['Records']:
-        notification_id = record['messageAttributes']['notification_id']['stringValue']
+        notification_id = json.loads(record['body'])["id"]
         
         # Update DynamoDB record with delivery_status as SEND_FAIL
         dynamodb.update_item(
@@ -24,7 +25,7 @@ def handler(event, context):
                 ':status': {'S': 'SEND_FAIL'}
             }
         )
-                # Delete the processed message from SQS Queue 2
+
         sqs.delete_message(
             QueueUrl=DLQ_QUEUE,
             ReceiptHandle=record['receiptHandle']
