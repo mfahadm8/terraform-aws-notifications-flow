@@ -4,10 +4,10 @@ import os
 dynamodb = boto3.client('dynamodb')
 sqs = boto3.client("sqs")
 
-DB_TABLE=os.environ("DB_TABLE")
-DLQ_QUEUE=os.environ("DLQ_QUEUE")
+DB_TABLE=os.environ.get("DB_TABLE")
+DLQ_QUEUE=os.environ.get("DLQ_QUEUE")
 
-def lambda_handler(event, context):
+def handler(event, context):
     print(event)
 
     for record in event['Records']:

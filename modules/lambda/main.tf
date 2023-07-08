@@ -13,7 +13,7 @@ data "aws_dynamodb_table" "notification" {
 data "archive_file" "notification_forwarder_zip" {
   type        = "zip"
   source_dir  = "${path.root}/src/NotificationsForwarder"
-  output_path = "${path.root}/notification_forwarder_package.zip"
+  output_path = "${path.root}/tmp/notification_forwarder_package.zip"
 }
 
 data "archive_file" "notification_failure_update_zip" {
@@ -33,8 +33,8 @@ resource "aws_lambda_function" "notification_forwarder" {
   handler          = "index.handler"
   runtime          = "python3.10"
   role             = aws_iam_role.notification_forwarder_role.arn
-  source_code_hash = data.archive_file.notification_failure_update_zip.output_base64sha256
-  filename         = data.archive_file.notification_failure_update_zip.output_path
+  source_code_hash = data.archive_file.notification_forwarder_zip.output_base64sha256
+  filename         = data.archive_file.notification_forwarder_zip.output_path
   memory_size      = 128
   timeout          = 10
 
@@ -52,8 +52,8 @@ resource "aws_lambda_function" "notification_failure_update" {
   handler          = "index.handler"
   runtime          = "python3.10"
   role             = aws_iam_role.notification_failure_update_role.arn
-  source_code_hash = data.archive_file.notification_forwarder_zip.output_base64sha256
-  filename         = data.archive_file.notification_forwarder_zip.output_path
+  source_code_hash = data.archive_file.notification_failure_update_zip.output_base64sha256
+  filename         = data.archive_file.notification_failure_update_zip.output_path
   memory_size      = 128
   timeout          = 10
 
@@ -122,7 +122,9 @@ resource "aws_iam_policy" "notification_queue_policy" {
       "Effect": "Allow",
       "Action": [
         "sqs:SendMessage",
-        "sqs:DeleteMessage"
+        "sqs:DeleteMessage",
+        "sqs:ReceiveMessage",
+        "sqs:GetQueueAttributes"
       ],
       "Resource": [
         "arn:aws:sqs:${var.region}:${var.account_id}:${var.notification_queue_name}"
@@ -144,7 +146,9 @@ resource "aws_iam_policy" "notification_dlq_policy" {
       "Effect": "Allow",
       "Action": [
         "sqs:SendMessage",
-        "sqs:DeleteMessage"
+        "sqs:DeleteMessage",
+        "sqs:ReceiveMessage",
+        "sqs:GetQueueAttributes"
       ],
       "Resource": [
         "arn:aws:sqs:${var.region}:${var.account_id}:${var.notification_dlq_name}"
@@ -285,13 +289,6 @@ resource "aws_lambda_permission" "dynamodb_stream" {
   source_arn = data.aws_dynamodb_table.notification.arn
 }
 
-# Lambda Events
-resource "aws_lambda_event_source_mapping" "dynamodb_stream_event" {
-  event_source_arn  = data.aws_dynamodb_table.notification.stream_arn
-  function_name     = aws_lambda_function.notification_forwarder.arn
-  starting_position = "LATEST"
-}
-
 resource "aws_lambda_permission" "notification_queue_permission" {
   statement_id  = "AllowLambdaOrderProcessingQueue"
   action        = "lambda:InvokeFunction"
@@ -307,5 +304,27 @@ resource "aws_lambda_permission" "notification_dlq_permission" {
   principal     = "sqs.amazonaws.com"
   source_arn    = data.aws_sqs_queue.notification_dlq_queue.arn
 }
+
+# Lambda Events
+resource "aws_lambda_event_source_mapping" "dynamodb_stream_event" {
+  event_source_arn  = data.aws_dynamodb_table.notification.stream_arn
+  function_name     = aws_lambda_function.notification_forwarder.arn
+  starting_position = "LATEST"
+}
+
+resource "aws_lambda_event_source_mapping" "sqs_trigger" {
+  event_source_arn                   = data.aws_sqs_queue.notification_queue.arn
+  function_name                      = aws_lambda_function.notification_processing.arn
+  batch_size                         = 10
+  maximum_batching_window_in_seconds = 0
+}
+
+resource "aws_lambda_event_source_mapping" "dlq_trigger" {
+  event_source_arn                   = data.aws_sqs_queue.notification_dlq_queue.arn
+  function_name                      = aws_lambda_function.notification_failure_update.arn
+  batch_size                         = 10
+  maximum_batching_window_in_seconds = 0
+}
+
 
 

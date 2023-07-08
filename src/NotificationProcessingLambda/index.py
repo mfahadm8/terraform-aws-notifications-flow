@@ -7,12 +7,12 @@ sns = boto3.client('sns')
 ses = boto3.client('ses')
 sqs = boto3.client('sqs')
 
-SQS_QUEUE=os.environ("SQS_QUEUE")
-DLQ_QUEUE=os.environ("DLQ_QUEUE")
-SNS_TOPIC_ARN=os.environ("SNS_TOPIC_ARN")
-NOTIFICATION_SES_TEMPLATE=os.environ("NOTIFICATION_SES_TEMPLATE")
+SQS_QUEUE=os.environ.get("SQS_QUEUE")
+DLQ_QUEUE=os.environ.get("DLQ_QUEUE")
+SNS_TOPIC_ARN=os.environ.get("SNS_TOPIC_ARN")
+NOTIFICATION_SES_TEMPLATE=os.environ.get("NOTIFICATION_SES_TEMPLATE")
 
-def lambda_handler(event, context):
+def handler(event, context):
     print(event)
     for record in event['Records']:
         message = json.loads(record['body'])
