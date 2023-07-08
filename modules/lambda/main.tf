@@ -103,7 +103,8 @@ resource "aws_iam_policy" "notifications_db_read_policy" {
         "dynamodb:*"
       ],
       "Resource": [
-        "arn:aws:dynamodb:${var.region}:${var.account_id}:table/${var.dynamodb_table_name}*"
+        "arn:aws:dynamodb:${var.region}:${var.account_id}:table/${var.dynamodb_table_name}",
+         "${data.aws_dynamodb_table.notification.stream_arn}"
       ]
     }
   ]
@@ -164,7 +165,7 @@ resource "aws_iam_policy" "lambda_logs_policy" {
         {
             "Effect": "Allow",
             "Action": "logs:CreateLogGroup",
-            "Resource": "arn:aws:logs:region:accountID:*"
+            "Resource": "arn:aws:logs:${var.region}:${var.account_id}:*"
         },
 
         {
@@ -174,7 +175,7 @@ resource "aws_iam_policy" "lambda_logs_policy" {
                 "logs:PutLogEvents"
             ],
             "Resource": [
-                "arn:aws:logs:region:accountID:log-group:*"
+                "arn:aws:logs:${var.region}:${var.account_id}:log-group:*"
             ]
         }
     ]
@@ -285,7 +286,7 @@ resource "aws_lambda_permission" "dynamodb_stream" {
 }
 
 # Lambda Events
-resource "aws_lambda_event_source_mapping" "dynamodb_stream" {
+resource "aws_lambda_event_source_mapping" "dynamodb_stream_event" {
   event_source_arn  = data.aws_dynamodb_table.notification.stream_arn
   function_name     = aws_lambda_function.notification_forwarder.arn
   starting_position = "LATEST"
