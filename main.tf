@@ -28,6 +28,7 @@ module "lambda" {
   dynamodb_table_name            = module.dynamodb.dynamo_table_name
   notifications_sns_topic        = module.sns.notification_sns_topic
   notification_ses_template_name = module.ses.notification_ses_template_name
+  sns_sender_email               = var.sns_sender_email
   depends_on                     = [module.sqs, module.dynamodb, module.ses, module.sns]
 }
 

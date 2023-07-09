@@ -32,3 +32,8 @@ variable "notification_ses_template_name" {
   description = "Notifications SES Template Name"
   type        = string
 }
+
+variable "sns_sender_email" {
+  description = "SES Source Email Address"
+  type        = string
+}

@@ -85,6 +85,7 @@ resource "aws_lambda_function" "notification_processing" {
       SQS_QUEUE                 = data.aws_sqs_queue.notification_queue.url
       DLQ_QUEUE                 = data.aws_sqs_queue.notification_dlq_queue.url
       NOTIFICATION_SES_TEMPLATE = var.notification_ses_template_name
+      SENDER_EMAIL              = var.sns_sender_email
     }
   }
 
@@ -189,12 +190,36 @@ EOF
 
 }
 
+
+resource "aws_iam_policy" "lambda_sns_policy" {
+  name = "lambda_sns_policy"
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+
+    {
+      "Effect": "Allow",
+      "Action": [
+        "sns:*",
+        "ses:*"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+EOF
+
+}
+
 locals {
   policy_arns = [
     aws_iam_policy.notifications_db_read_policy.arn,
     aws_iam_policy.notification_queue_policy.arn,
     aws_iam_policy.notification_dlq_policy.arn,
     aws_iam_policy.lambda_logs_policy.arn,
+    aws_iam_policy.lambda_sns_policy.arn
 
   ]
 }
