@@ -24,9 +24,15 @@ def handler(event, context):
             mobile_no =  message['mobile_no']
             sms_message = message['sms_message']
             # Send SMS using SNS
+            smsattrs = {
+                'AWS.SNS.SMS.SenderID': { 'DataType': 'String', 'StringValue': 'Inphln' },
+                'AWS.SNS.SMS.SMSType': { 'DataType': 'String', 'StringValue': 'Transactional'}
+            }
             sns.publish(
                 PhoneNumber=mobile_no,
-                Message=f"Hi, {to_name},\n"+sms_message
+                Message=f"Hi, {to_name},\n"+sms_message,
+                MessageAttributes = smsattrs
+
             )
             # pinpoint = boto3.client('pinpoint')
             # response=pinpoint.send_messages(
