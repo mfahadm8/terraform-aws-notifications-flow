@@ -1,0 +1,7 @@
+{
+    "id": "2",
+    "mobile_no": "+61XXXXXXX",
+    "to_name": "Suraj",
+    "sms_message": "Some text message",
+    "notification_type": "SMS"
+}

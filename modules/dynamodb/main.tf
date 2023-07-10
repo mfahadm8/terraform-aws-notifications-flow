@@ -13,7 +13,7 @@ resource "aws_dynamodb_table" "notification" {
 
   attribute {
     name = "id"
-    type = "N"
+    type = "S"
   }
 }
 
