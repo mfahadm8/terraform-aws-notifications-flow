@@ -4,7 +4,7 @@
     - `sns_sender_email` - The EMAIL Address that has to be provided as Source/Sender while sending EMAIL notifications
 
 ## Installation Command
-The following command deploys the entire infrastructure on cloud including database and everything.
+The following command deploys the entire infrastructure on cloud including database and everything. The flow for triggers every new notification id pushed to dynamodb and not on the existing db entry modificatoin.
 ```bash
 terraform apply
 ```
