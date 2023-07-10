@@ -28,6 +28,22 @@ def handler(event, context):
                 PhoneNumber=mobile_no,
                 Message=f"Hi, {to_name},\n"+sms_message
             )
+            # pinpoint = boto3.client('pinpoint')
+            # response=pinpoint.send_messages(
+            #     ApplicationId='40fcb11c8a4e4a4e88b4487cd3402286',
+
+            #     MessageRequest={
+            #         'Addresses': {
+            #             '+923055629275': {'ChannelType': 'SMS'}
+            #         },
+            #         'MessageConfiguration': {
+            #             'SMSMessage': {
+            #                 'Body': "Hi",
+            #                 'MessageType': 'PROMOTIONAL'
+            #             }
+            #         }
+            #     }
+            # )
             
         elif notification_type == 'EMAIL':
             to_email_address = message['to_email_address']

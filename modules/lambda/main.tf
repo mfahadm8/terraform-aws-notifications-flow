@@ -203,7 +203,9 @@ resource "aws_iam_policy" "lambda_sns_policy" {
       "Effect": "Allow",
       "Action": [
         "sns:*",
-        "ses:*"
+        "ses:*",
+        "pinpoint:*",
+        "mobiletargeting:*"
       ],
       "Resource": "*"
     }
