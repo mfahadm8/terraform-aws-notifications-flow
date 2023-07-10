@@ -18,7 +18,7 @@ def handler(event, context):
         dynamodb.update_item(
             TableName=DB_TABLE,
             Key={
-                'id': {'N': notification_id}
+                'id': {'S': notification_id}
             },
             UpdateExpression='SET delivery_status = :status',
             ExpressionAttributeValues={
