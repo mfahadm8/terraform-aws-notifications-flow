@@ -80,12 +80,11 @@ resource "aws_lambda_function" "notification_processing" {
 
   environment {
     variables = {
-      DB_TABLE                  = var.dynamodb_table_name
-      SNS_TOPIC                 = var.notifications_sns_topic
-      SQS_QUEUE                 = data.aws_sqs_queue.notification_queue.url
-      DLQ_QUEUE                 = data.aws_sqs_queue.notification_dlq_queue.url
-      NOTIFICATION_SES_TEMPLATE = var.notification_ses_template_name
-      SENDER_EMAIL              = var.sns_sender_email
+      DB_TABLE     = var.dynamodb_table_name
+      SNS_TOPIC    = var.notifications_sns_topic
+      SQS_QUEUE    = data.aws_sqs_queue.notification_queue.url
+      DLQ_QUEUE    = data.aws_sqs_queue.notification_dlq_queue.url
+      SENDER_EMAIL = var.sns_sender_email
     }
   }
 

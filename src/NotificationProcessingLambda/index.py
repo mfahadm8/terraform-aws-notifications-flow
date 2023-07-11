@@ -10,8 +10,8 @@ sns = boto3.client('sns')
 SQS_QUEUE=os.environ.get("SQS_QUEUE")
 DLQ_QUEUE=os.environ.get("DLQ_QUEUE")
 SNS_TOPIC_ARN=os.environ.get("SNS_TOPIC")
-NOTIFICATION_SES_TEMPLATE=os.environ.get("NOTIFICATION_SES_TEMPLATE")
 SENDER_EMAIL=os.environ.get("SENDER_EMAIL")
+
 def handler(event, context):
     print(event)
     for record in event['Records']:
@@ -36,18 +36,15 @@ def handler(event, context):
             )
         elif notification_type == 'EMAIL':
             to_email_address = message['to_email_address']
-            template_data = json.dumps({
-                'name': to_name,
-                'favoriteanimal': 'alligator'
-            })
-
+            email_template = message['email_template']
+            template_data=get_template_data(email_template,message)
             response = ses.send_templated_email(
                 Source=SENDER_EMAIL,
                 Destination={
                     'ToAddresses': [to_email_address],
                 },
                 ReplyToAddresses=[SENDER_EMAIL],
-                Template=NOTIFICATION_SES_TEMPLATE,
+                Template=email_template,
                 TemplateData=template_data
             )
             print(response)
@@ -69,3 +66,28 @@ def handler(event, context):
             QueueUrl=SQS_QUEUE,
             ReceiptHandle=record['receiptHandle']
         )
+
+def get_template_data(email_template_name,message):
+    if email_template_name == "NotificationSESTemplate":
+        to_name=message["to_name"]
+        template_data = json.dumps({
+            'name': to_name,
+            'favoriteanimal': 'alligator'
+        })
+        return template_data
+    
+    elif email_template_name == "NotificationUserPasswordChangeRequest":
+        to_name=message["to_name"]
+        verification_code=message["verification_code"]
+        template_data = json.dumps({
+            'name': to_name,
+            'verification_code': verification_code
+        })
+        return template_data
+    
+    elif email_template_name == "NotificationNewUserSignup":
+        to_name=message["to_name"]
+        template_data = json.dumps({
+            'name': to_name
+        })
+        return template_data
