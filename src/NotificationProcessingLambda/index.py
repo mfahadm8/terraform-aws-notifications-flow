@@ -25,7 +25,7 @@ def handler(event, context):
             sms_message = message['sms_message']
             # Send SMS using SNS
             smsattrs = {
-                'AWS.SNS.SMS.SenderID': { 'DataType': 'String', 'StringValue': 'Inphln' },
+                'AWS.SNS.SMS.SenderID': { 'DataType': 'String', 'StringValue': 'Suraj' },
                 'AWS.SNS.SMS.SMSType': { 'DataType': 'String', 'StringValue': 'Transactional'}
             }
             sns.publish(
