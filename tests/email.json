@@ -2,5 +2,22 @@
     "id": "1",
     "to_name": "Suraj",
     "to_email_address": "testemail@gmail.com",
-    "notification_type": "EMAIL"
+    "notification_type": "EMAIL",
+    "email_template": "NotificationSESTemplate",
+    "favoriteanimal": "Cat"
+},
+{
+    "id": "2",
+    "to_name": "Suraj",
+    "to_email_address": "testemail@gmail.com",
+    "notification_type": "EMAIL",
+    "email_template": "NotificationUserPasswordChangeRequest",
+    "verification_code": "32324"
+},
+{
+    "id": "3",
+    "to_name": "Suraj",
+    "to_email_address": "testemail@gmail.com",
+    "notification_type": "EMAIL",
+    "email_template": "NotificationNewUserSignup",
 }

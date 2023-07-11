@@ -1,7 +1,7 @@
 import boto3
 import json 
 import os
-
+import datetime
 dynamodb = boto3.client('dynamodb')
 
 ses = boto3.client('ses')
@@ -50,14 +50,16 @@ def handler(event, context):
             print(response)
 
         # Update DynamoDB record with delivery_status as SENT
+        timestamp = str(int(datetime.datetime.now().timestamp()*1000))  # Get current date and time
         dynamodb.update_item(
             TableName=os.environ['DB_TABLE'],
             Key={
                 'id': {'S': notification_id}
             },
-            UpdateExpression='SET delivery_status = :status',
+            UpdateExpression='SET delivery_status = :status, delivery_timestamp = :timestamp',
             ExpressionAttributeValues={
-                ':status': {'S': 'SENT'}
+                ':status': {'S': 'SENT'},
+                ':timestamp': {'S': timestamp}
             }
         )
         
@@ -70,9 +72,10 @@ def handler(event, context):
 def get_template_data(email_template_name,message):
     if email_template_name == "NotificationSESTemplate":
         to_name=message["to_name"]
+        favoriteanimal=message["favoriteanimal"]
         template_data = json.dumps({
             'name': to_name,
-            'favoriteanimal': 'alligator'
+            'favoriteanimal': favoriteanimal
         })
         return template_data
     
