@@ -1,0 +1,8 @@
+{
+    "id": "2",
+    "to_name": "Suraj",
+    "to_email_address": "testemail@gmail.com",
+    "notification_type": "EMAIL",
+    "email_template": "NotificationUserPasswordChangeRequest",
+    "verification_code": "32324"
+}

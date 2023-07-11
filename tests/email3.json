@@ -1,8 +1,7 @@
 {
-    "id": "1",
+    "id": "3",
     "to_name": "Suraj",
     "to_email_address": "testemail@gmail.com",
     "notification_type": "EMAIL",
-    "email_template": "NotificationSESTemplate",
-    "favoriteanimal": "Cat"
+    "email_template": "NotificationNewUserSignup"
 }
