@@ -7,5 +7,5 @@ variable "region" {
 variable "sns_sender_email" {
   description = "SES Source Email Address"
   type        = string
-  default     = "mfahadm8@gmail.com"
+  default     = "Fahad <mfahadm8@gmail.com>"
 }
