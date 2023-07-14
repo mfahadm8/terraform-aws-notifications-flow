@@ -23,6 +23,12 @@ notification=$(cat "$json_file")
 put_notification_entry() {
     local item="{"
 
+    # Generate a random ID
+    random_id=$((RANDOM % 10000 + 1))
+
+    # Append the ID to the JSON object
+    item+="\"id\": {\"S\": \"$random_id\"},"
+
     while IFS=":" read -r key value; do
         key=$(echo "$key" | tr -d '"' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
         value=$(echo "$value" | tr -d '"' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
